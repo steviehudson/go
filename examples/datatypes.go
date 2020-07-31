@@ -1,8 +1,6 @@
-package main
+package examples
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func datatypes() {
 

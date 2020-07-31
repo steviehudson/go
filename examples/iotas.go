@@ -1,8 +1,6 @@
-package main
+package examples
 
-import (
-	"fmt"
-)
+import "fmt"
 
 const (
 	global  = "global"
@@ -25,7 +23,7 @@ const (
 	iotaReset = iota
 )
 
-func iotatest() {
+func iotas() {
 
 	fmt.Println(global, another)
 	fmt.Println(iotaGlobal, iotaAnother)
