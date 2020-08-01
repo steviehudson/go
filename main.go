@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 
-	"github.com.pluralsight/webservice/models"
+	"github.com.pluralsight/webservice/controllers"
 )
 
+//fire up webservice
+
 func main() {
-	u := models.User{
-		ID:        1,
-		Firstname: "Stevie",
-		LastName:  "Hudson",
-	}
-	fmt.Println(u)
+	//front controller - handle all routing in entire project using calls to handle methds in RegisterControllers method
+	controllers.RegisterControllers()
+	//http server up and running
+	http.ListenAndServe(":3000", nil)
 }
