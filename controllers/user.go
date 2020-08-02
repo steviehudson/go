@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com.pluralsight/webservice/models"
 )
@@ -17,10 +18,39 @@ type userController struct {
 	userIDPattern *regexp.Regexp
 }
 
-//bind to method
+//routes to method
 //package documentaion for http handler - defines interface ServeHTTP(http.ResponseWriter, *http.Request)
 //therefore automatically implements the handler interface
 func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/users" {
+		switch r.Method {
+		case http.MethodGet:
+			uc.getALL(w, r)
+		case http.MethodPost:
+			uc.post(w, r)
+		default:
+			w.WriteHeader(http.StatusNotImplemented)
+		}
+	} else {
+		matches := uc.userIDPattern.FindStringSubmatch(r.URL.Path)
+		if len(matches) == 0 {
+			w.WriteHeader(http.StatusNotFound)
+		}
+		id, err := strconv.Atoi(matches[1])
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+		}
+		switch r.Method {
+		case http.MethodGet:
+			uc.get(id, w)
+		case http.MethodPut:
+			uc.put(id, w, r)
+		case http.MethodDelete:
+			uc.delete(id, w)
+		default:
+			w.WriteHeader(http.StatusNotImplemented)
+		}
+	}
 	//interact with external, for example network pot or file system, usually bite slices
 	w.Write([]byte("Hello from the User Controller"))
 }
@@ -72,7 +102,7 @@ func (uc *userController) put(id int, w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	encodeResponseAsJSON(u, W)
+	encodeResponseAsJSON(u, w)
 }
 
 func (uc *userController) delete(id int, w http.ResponseWriter) {
@@ -85,7 +115,7 @@ func (uc *userController) delete(id int, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (uc *userController) parseRequest(r *http.Request) (models.user, error) {
+func (uc *userController) parseRequest(r *http.Request) (models.User, error) {
 	dec := json.NewDecoder(r.Body)
 	var u models.User
 	err := dec.Decode(&u)
